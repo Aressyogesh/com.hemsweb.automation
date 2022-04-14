@@ -14,8 +14,10 @@ import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -35,6 +37,11 @@ import com.hemsweb.base.BaseClass;
  */
 public class Action extends BaseClass implements ActionInterface {
 
+	
+	BaseClass objbase = new BaseClass();
+	
+	
+	
 	@Override
 	public void scrollByVisibilityOfElement(WebDriver driver, WebElement ele) {
 		JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -786,4 +793,59 @@ public class Action extends BaseClass implements ActionInterface {
 		return currentDate;
 	}
 
+	public boolean setText(By locator, String fieldValue) 
+	{
+		waitForElementPresence(locator, 10);
+		WebElement webElement = objbase.getDriver().findElement(locator);
+		try
+		{
+			// replace the text
+			JavascriptExecutor executor = (JavascriptExecutor)objbase.getDriver();
+			executor.executeScript("arguments[0].click();", webElement);
+			webElement.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+			webElement.sendKeys(Keys.DELETE);
+			webElement.clear();
+			webElement.sendKeys(fieldValue);
+			//webElement.sendKeys(Keys.TAB);
+			return true;
+		} 
+		catch (Exception exception)
+		{
+			exception.printStackTrace();
+			return false;
+		}
+	}
+	
+	public void waitForElementPresence(By locator, int waitInSeconds) 
+	{
+		try 
+		{
+			WebDriverWait wait = (WebDriverWait) new WebDriverWait(objbase.getDriver(), waitInSeconds).ignoring(StaleElementReferenceException.class);
+			wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+		} 
+		catch(Exception exception)
+		{
+			exception.printStackTrace();
+		}
+	}
+	
+	public boolean click(By locator) 
+	{
+		waitForElementPresence(locator, 10);
+		WebElement webElement = objbase.getDriver().findElement(locator);
+		try
+		{
+			JavascriptExecutor executor = (JavascriptExecutor)objbase.getDriver();
+			executor.executeScript("arguments[0].click();", webElement);
+			return true;
+		} 
+		catch (Exception exception)
+		{
+			exception.printStackTrace();
+			return false;
+		}
+	}
+	
+	
+	
 }
